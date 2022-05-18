@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <title>Yapılacaklar Listesi</title>
+<style>
+    .completed{
+        text-decoration: line-through;
+        color:red;
+    }
+</style>
+  </head>
+
+  <body>
+    <div class="container" id="page-content">
+        <div class="p-5">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-md-12">
+                    <div class="card px-3">
+                        <div class="card-body">
+                            <h4 class="card-title">Todo list</h4>
+                            <div class="add-items d-flex">
+                            <input type="text" class="form-control todo-list-input" id="task" placeholder="What is your main focus for today ?">
+                            <button class="add btn btn-primary font-weight-bold todo-list-add-btn">Add</button> </div>
+                            <div class="list-wrapper">
+                                <ul id="list" class="tasks d-flex flex-column mt-2 mb-2">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+      <script
+        src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"
+      ></script>
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"
+      ></script>
+    
+  </body>
+  <script>
+
+let ul = document.querySelector('ul');
+let add = document.querySelector('.add');
+const savedTodos = JSON.parse(localStorage.getItem("todos")) || []; // Retrieves local storage todo OR creates empty array if none exist
+console.log(savedTodos);
+let newItem = document.querySelector('.todo-list-input');
+
+add.addEventListener('click',saveTask);
+
+function toggleTask(){
+    if(this.parentElement.classList.contains('completed')){
+        this.parentElement.classList.remove('completed');
+        savedTodos[this.parentElement.id].isCompleted = false;
+        localStorage.setItem("todos",JSON.stringify(savedTodos));
+    }else{
+        this.parentElement.classList.add('completed');
+        savedTodos[this.parentElement.id].isCompleted = true;
+        localStorage.setItem("todos",JSON.stringify(savedTodos));
+    }
+
+}
+
+function delTask(){
+        console.log(this.parentElement.id);
+        savedTodos.splice(this.parentElement.id-1,1);
+        console.log(savedTodos);
+        localStorage.setItem("todos",JSON.stringify(savedTodos));
+        this.parentElement.remove();
+        location.reload();
+}
+
+
+function saveTask() {
+    if(newItem.value){
+    savedTodos.push({task: newItem.value, isCompleted: false}); // Appends the new todo to array
+    localStorage.setItem("todos", JSON.stringify(savedTodos)); //Converts object to string and stores in local storage
+    newItem.value = '';
+    location.reload();
+    }else if(newItem.value === ""){
+        alert("Please enter a task");
+    }
+}
+
+function loadTask(){
+    for(let i=0;i<savedTodos.length;i++){
+
+        let newTodo = document.createElement('span');
+        let delButton = document.createElement('button');
+        let checkIcon = document.createElement('button');
+        checkIcon.innerText = "Done !";
+        checkIcon.classList.add("bg-primary","btn","text-light","float-right");
+        delButton.classList.add("bg-danger","btn","float-right","text-light")
+        delButton.innerText = "Delete Task";
+        newTodo.setAttribute('id',i);
+        if(savedTodos[i].isCompleted === true){
+            newTodo.classList.add('completed');
+        }
+        newTodo.innerText = savedTodos[i].task;
+        
+        ul.appendChild(newTodo);
+        
+        newTodo.appendChild(delButton);
+        newTodo.appendChild(checkIcon);
+        checkIcon.addEventListener('click',toggleTask);
+        delButton.addEventListener('click',delTask);
+    }
+    
+}
+loadTask();
+
+  </script>
+</html>
